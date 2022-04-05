@@ -350,3 +350,67 @@ impl<'a> SerializingSection<'a> {
         }
     }
 }
+
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct SerializingPageOrSection<'a> {
+    ancestors: Vec<&'a str>,
+    assets: &'a [String],
+    components: &'a [String],
+    content: &'a str,
+    description: &'a Option<String>,
+    draft: bool,
+    extra: &'a Map<String, Value>,
+    lang: &'a str,
+    path: &'a str,
+    permalink: &'a str,
+    reading_time: Option<usize>,
+    relative_path: &'a str,
+    title: &'a Option<String>,
+    toc: &'a [Heading],
+    translations: Vec<TranslatedContent<'a>>,
+    word_count: Option<usize>,
+}
+
+impl<'a> SerializingPageOrSection<'a> {
+    pub fn from_serializing_page(serializing_page: &'a SerializingPage<'a>) -> Self {
+        Self {
+            ancestors: serializing_page.ancestors.clone(),
+            assets: serializing_page.assets,
+            components: serializing_page.components,
+            content: serializing_page.content,
+            description: serializing_page.description,
+            draft: serializing_page.draft,
+            extra: serializing_page.extra,
+            lang: serializing_page.lang,
+            path: serializing_page.path,
+            permalink: serializing_page.permalink,
+            reading_time: serializing_page.reading_time,
+            relative_path: serializing_page.relative_path,
+            title: serializing_page.title,
+            toc: serializing_page.toc,
+            translations: serializing_page.translations.clone(),
+            word_count: serializing_page.word_count,
+        }
+    }
+
+    pub fn from_serializing_section(serializing_page: &'a SerializingSection<'a>) -> Self {
+        Self {
+            ancestors: serializing_page.ancestors.clone(),
+            assets: serializing_page.assets,
+            components: serializing_page.components,
+            content: serializing_page.content,
+            description: serializing_page.description,
+            draft: serializing_page.draft,
+            extra: serializing_page.extra,
+            lang: serializing_page.lang,
+            path: serializing_page.path,
+            permalink: serializing_page.permalink,
+            reading_time: serializing_page.reading_time,
+            relative_path: serializing_page.relative_path,
+            title: serializing_page.title,
+            toc: serializing_page.toc,
+            translations: serializing_page.translations.clone(),
+            word_count: serializing_page.word_count,
+        }
+    }
+}

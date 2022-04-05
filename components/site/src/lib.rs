@@ -17,7 +17,7 @@ use walkdir::{DirEntry, WalkDir};
 use config::{get_config, Config};
 use errors::{bail, Error, Result};
 use front_matter::InsertAnchor;
-use library::{find_taxonomies, Library, Page, Paginator, Section, Taxonomy};
+use library::{find_taxonomies, Library, Page, Paginator, Section, SerializingPageOrSection, Taxonomy};
 use relative_path::RelativePathBuf;
 use std::time::Instant;
 use templates::{load_tera, render_redirect_template};
@@ -1005,7 +1005,10 @@ impl Site {
                 Some(&PathBuf::from(&section.path[1..])),
                 &section.lang,
                 |mut context: Context| {
-                    context.insert("section", &section.to_serialized(library));
+                    let section = section.to_serialized(library);
+                    let common = SerializingPageOrSection::from_serializing_section(&section);
+                    context.insert("section", &section);
+                    context.insert("common", &common);
                     context
                 },
             )?;

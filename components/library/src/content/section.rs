@@ -13,7 +13,7 @@ use utils::site::get_reading_analytics;
 use utils::templates::{render_template, ShortcodeDefinition};
 
 use crate::content::file_info::FileInfo;
-use crate::content::ser::SerializingSection;
+use crate::content::ser::{SerializingPageOrSection, SerializingSection};
 use crate::content::{find_related_assets, has_anchor};
 use crate::library::Library;
 
@@ -159,7 +159,10 @@ impl Section {
         );
         context.set_shortcode_definitions(shortcode_definitions);
         context.set_current_page_path(&self.file.relative);
-        context.tera_context.insert("section", &SerializingSection::from_section_basic(self, None));
+        let section = SerializingSection::from_section_basic(self, None);
+        let common = SerializingPageOrSection::from_serializing_section(&section);
+        context.tera_context.insert("section", &section);
+        context.tera_context.insert("common", &common);
 
         let res = render_content(&self.raw_content, &context).map_err(|e| {
             Error::chain(format!("Failed to render content of {}", self.file.path.display()), e)
@@ -180,7 +183,10 @@ impl Section {
         context.insert("config", &config.serialize(&self.lang));
         context.insert("current_url", &self.permalink);
         context.insert("current_path", &self.path);
-        context.insert("section", &self.to_serialized(library));
+        let section = self.to_serialized(library);
+        let common = SerializingPageOrSection::from_serializing_section(&section);
+        context.insert("section", &section);
+        context.insert("common", &common);
         context.insert("lang", &self.lang);
 
         render_template(tpl_name, tera, context, &config.theme).map_err(|e| {

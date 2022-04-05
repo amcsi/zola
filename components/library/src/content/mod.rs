@@ -10,7 +10,7 @@ use walkdir::WalkDir;
 pub use self::file_info::FileInfo;
 pub use self::page::Page;
 pub use self::section::Section;
-pub use self::ser::{SerializingPage, SerializingSection};
+pub use self::ser::{SerializingPage, SerializingPageOrSection, SerializingSection};
 
 use config::Config;
 use rendering::Heading;

@@ -8,7 +8,7 @@ use config::Config;
 use errors::{Error, Result};
 use utils::templates::{check_template_fallbacks, render_template};
 
-use crate::content::{Section, SerializingPage, SerializingSection};
+use crate::content::{Section, SerializingPage, SerializingPageOrSection, SerializingSection};
 use crate::library::Library;
 use crate::taxonomies::{Taxonomy, TaxonomyItem};
 
@@ -233,8 +233,10 @@ impl<'a> Paginator<'a> {
         let mut context = Context::new();
         match self.root {
             PaginationRoot::Section(s) => {
-                context
-                    .insert("section", &SerializingSection::from_section_basic(s, Some(library)));
+                let section = SerializingSection::from_section_basic(s, Some(library));
+                let common = SerializingPageOrSection::from_serializing_section(&section);
+                context.insert("section", &section);
+                context.insert("common", &common);
                 context.insert("lang", &s.lang);
                 context.insert("config", &config.serialize(&s.lang));
             }

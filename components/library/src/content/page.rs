@@ -17,7 +17,7 @@ use utils::slugs::slugify_paths;
 use utils::templates::{render_template, ShortcodeDefinition};
 
 use crate::content::file_info::FileInfo;
-use crate::content::ser::SerializingPage;
+use crate::content::ser::{SerializingPage, SerializingPageOrSection};
 use crate::content::{find_related_assets, has_anchor};
 use utils::fs::read_file;
 use utils::links::has_anchor_id;
@@ -238,8 +238,10 @@ impl Page {
         );
         context.set_shortcode_definitions(shortcode_definitions);
         context.set_current_page_path(&self.file.relative);
-        context.tera_context.insert("page", &SerializingPage::from_page_basic(self, None));
-
+        let page = SerializingPage::from_page_basic(self, None);
+        let common = SerializingPageOrSection::from_serializing_page(&page);
+        context.tera_context.insert("page", &page);
+        context.tera_context.insert("common", &common);
         let res = render_content(&self.raw_content, &context).map_err(|e| {
             Error::chain(format!("Failed to render content of {}", self.file.path.display()), e)
         })?;
@@ -267,7 +269,10 @@ impl Page {
         context.insert("config", &config.serialize(&self.lang));
         context.insert("current_url", &self.permalink);
         context.insert("current_path", &self.path);
-        context.insert("page", &self.to_serialized(library));
+        let page = self.to_serialized(library);
+        let common = SerializingPageOrSection::from_serializing_page(&page);
+        context.insert("page", &page);
+        context.insert("common", &common);
         context.insert("lang", &self.lang);
 
         render_template(tpl_name, tera, context, &config.theme).map_err(|e| {
